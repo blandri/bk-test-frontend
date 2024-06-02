@@ -77,8 +77,7 @@ export function Dashboard() {
 
   const onPageChange = (index) => {
     setCurrentPage(index + 1);
-    if(currentPage < 2) getData(index * 5, 5);
-    else getData((index * 5 + 1), 5);
+    getData((index * 5), 5);
   };
 
   const onLogoutClick = () => {
@@ -262,8 +261,8 @@ export function Dashboard() {
                         <button
                           type="button"
                           onClick={() => onApproveClick(order.id)}
-                          disabled={approvingId === order.id}
-                          className="px-4 py-2 bg-[#16a34a] disabled:bg-[#60f195] rounded-xl"
+                          disabled={approvingId === order.id || !order.payed}
+                          className="px-4 py-2 bg-[#16a34a] disabled:bg-[#60f195] disabled:cursor-not-allowed rounded-xl"
                         >
                           {(approvingId === order.id &&
                             'Approving') ||
