@@ -60,7 +60,7 @@ export function SelectInput({ type, rows, field, error, setValue }) {
               </p>
             ))) || (
             <div className="h-full w-full grid place-items-center">
-              <p>No data</p>
+              <p>No fetched data, please refresh!</p>
             </div>
           )}
         </div>

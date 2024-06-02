@@ -5,7 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { NotificationBox } from './notification';
+import { NotificationBox } from './successNotification';
 import { PayModal } from './orderPayModal';
 import { SelectInput } from './selectInput';
 import { getAllFertilizers, getAllSeeds } from '../../api/product';
@@ -255,6 +255,7 @@ export function HomePageComponent() {
                 </div>
               </div>
             </div>
+            <div className="flex items-center justify-between">
             <button
               type="submit"
               disabled={sending}
@@ -262,6 +263,8 @@ export function HomePageComponent() {
             >
               {(sending && 'Sending') || 'Place order'}
             </button>
+            <a href='/login' className="mt-3 text-[#16a34a] text-lg font-bold">Login</a>
+            </div>
           </form>
         </div>
         <div className="w-1/2 h-full border-l border-secondary relative">

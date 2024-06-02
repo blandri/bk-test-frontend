@@ -1,6 +1,10 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 import React, { useEffect, useState } from 'react';
-import { approveOrder, getAllOrders } from '../../api/order';
+import { approveOrder, getAllOrders, rejectOrder } from '../../api/order';
+import { useNavigate } from 'react-router-dom';
+import { CreateFertilizerModal } from './createFertilizerModal';
+import { CreateSeedModal } from './createSeedModal';
+import { ErrorNotificationBox } from './errorNotification';
 
 export function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -8,6 +12,15 @@ export function Dashboard() {
   const [pages, setPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [approvingId, setApprovingId] = useState();
+  const [rejectingId, setRejectingId] = useState();
+  const [openCreateFertilizer, setOpenCreateFertilizer] = useState(false)
+  const [openCreateSeed, setOpenCreateSeed] = useState(false)
+  const [expand, setExpand] = useState(false)
+  const [showNot, setShowNot] = useState(false)
+  const [error, setError] = useState()
+
+  const navigate = useNavigate()
+  if(!localStorage.getItem('logged') || (localStorage.getItem('logged') !== 'true')) navigate('/')
 
   const getData = async (offset, limit) => {
     try {
@@ -17,6 +30,9 @@ export function Dashboard() {
       if (!res.has_error) {
         setOrders(res.data.data.rows);
         setPages(Math.ceil(res.data.data.count / limit));
+      } else {
+        setError(res.errors[0])
+        setShowNot(true)
       }
       setLoading(false);
     } catch (error) {
@@ -30,7 +46,7 @@ export function Dashboard() {
       const res = await approveOrder(id);
 
       if (!res.has_error) {
-        getData(currentPage, 5);
+        getData((currentPage - 1 * 5), 5);
       }
 
       setApprovingId(null);
@@ -40,10 +56,32 @@ export function Dashboard() {
     }
   };
 
+  const onRejectClick = async (id) => {
+    try {
+      setRejectingId(id);
+      const res = await rejectOrder(id);
+
+      if (!res.has_error) {
+        getData((currentPage - 1 * 5), 5);
+      }
+
+      setRejectingId(null);
+    } catch (error) {
+      setRejectingId(null);
+      console.log('Error caught - approveOrder()', error);
+    }
+  };
+
   const onPageChange = (index) => {
     setCurrentPage(index + 1);
-    getData(index + 0, 5);
+    if(currentPage < 2) getData(index * 5, 5);
+    else getData((index * 5 + 1), 5);
   };
+
+  const onLogoutClick = () => {
+    localStorage.removeItem('logged')
+    navigate('/')
+  }
 
   useEffect(() => {
     getData(0, 5);
@@ -51,6 +89,9 @@ export function Dashboard() {
 
   return (
     <div className="bg-primary h-screen overflow-hidden text-white flex">
+      {showNot && <ErrorNotificationBox setShow={setShowNot} message={error} />}
+      {openCreateFertilizer && <CreateFertilizerModal setOpen={setOpenCreateFertilizer} />}
+      {openCreateSeed && <CreateSeedModal setOpen={setOpenCreateSeed} />}
       <div className="border-r border-secondary w-fit h-full py-10 px-3 flex flex-col gap-8">
         <button
           type="button"
@@ -75,8 +116,26 @@ export function Dashboard() {
             />
           </svg>
         </button>
+        <div className="relative">
+        {expand && (
+          <div className="absolute left-[105%] bg-primary border border-tertial rounded-xl p-2 grid whitespace-nowrap">
+          <button type="button"
+          onClick={() => {
+            setExpand(false)
+            setOpenCreateFertilizer(true)
+          }}
+          className="hover:bg-[rgba(187,247,208,.2)] p-1 rounded-lg">Add fertilizer</button>
+          <button type="button"
+          onClick={() => {
+            setExpand(false)
+            setOpenCreateSeed(true)
+          }}
+          className="hover:bg-[rgba(187,247,208,.2)] p-1 rounded-lg">Add seed</button>
+        </div>
+        )}
         <button
           type="button"
+          onClick={() => setExpand(true)}
           className="text-white px-3 py-3 rounded-xl grid place-items-center bg-[rgba(187,247,208,.2)]"
         >
           <svg
@@ -94,8 +153,10 @@ export function Dashboard() {
             />
           </svg>
         </button>
+        </div>
         <button
           type="button"
+          onClick={() => onLogoutClick()}
           className="text-white px-3 py-3 rounded-xl grid place-items-center bg-[rgba(187,247,208,.2)]"
         >
           <svg
@@ -115,7 +176,7 @@ export function Dashboard() {
       <div className="p-10 w-full">
         <p className="text-3xl font-semibold">Orders</p>
         <div className="border border-tertial rounded-lg mt-10">
-          <div className="border-b border-tertial grid grid-cols-10 font-semibold">
+          <div className="border-b border-tertial grid grid-cols-11 font-semibold">
             <p className="border-r border-tertial text-center p-2">
               Date
             </p>
@@ -146,6 +207,9 @@ export function Dashboard() {
             <p className="border-r border-tertial text-center p-2">
               Approve
             </p>
+            <p className="border-r border-tertial text-center p-2">
+              Reject
+            </p>
           </div>
           {(loading && (
             <div className="h-[300px] grid place-items-center">
@@ -155,7 +219,7 @@ export function Dashboard() {
             <>
               {orders &&
                 orders.map((order) => (
-                  <div className="border-b border-tertial grid grid-cols-10">
+                  <div className="border-b border-tertial grid grid-cols-11">
                     <p className="border-r border-tertial text-center p-2">
                       {`${new Date(
                         order.createdAt,
@@ -200,6 +264,20 @@ export function Dashboard() {
                           {(approvingId === order.id &&
                             'Approving') ||
                             'Approve'}
+                        </button>
+                      )}
+                    </div>
+                    <div className="border-r border-tertial text-center p-2">
+                      {(order.rejected && 'Rejected') || (
+                        <button
+                          type="button"
+                          onClick={() => onRejectClick(order.id)}
+                          disabled={rejectingId === order.id}
+                          className="px-4 py-2 bg-[#e66868] disabled:bg-[#e79393] rounded-xl"
+                        >
+                          {(rejectingId === order.id &&
+                            'Rejecting') ||
+                            'Reject'}
                         </button>
                       )}
                     </div>
