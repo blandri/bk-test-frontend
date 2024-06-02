@@ -36,9 +36,7 @@ export const createFertilizer = async (name) => {
       'createFertilizer',
       false,
       {
-        data: {
-          name,
-        },
+        name: name
       },
     );
     return res;
@@ -56,9 +54,7 @@ export const createSeed = async (name) => {
       'createSeed',
       false,
       {
-        data: {
-          name,
-        },
+        name: name
       },
     );
     return res;

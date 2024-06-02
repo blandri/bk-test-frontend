@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { CreateFertilizerModal } from './createFertilizerModal';
 import { CreateSeedModal } from './createSeedModal';
 import { ErrorNotificationBox } from './errorNotification';
+import { SuccessNotificationBox } from './successNotification';
 
 export function Dashboard() {
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,8 @@ export function Dashboard() {
   const [expand, setExpand] = useState(false)
   const [showNot, setShowNot] = useState(false)
   const [error, setError] = useState()
+  const [openSuccess, setOpenSuccess] = useState(false)
+  const [message, setMessage] = useState()
 
   const navigate = useNavigate()
   if(!localStorage.getItem('logged') || (localStorage.getItem('logged') !== 'true')) navigate('/')
@@ -89,9 +92,10 @@ export function Dashboard() {
 
   return (
     <div className="bg-primary h-screen overflow-hidden text-white flex">
+      {openSuccess && <SuccessNotificationBox setShow={setOpenSuccess} message={message} />}
       {showNot && <ErrorNotificationBox setShow={setShowNot} message={error} />}
-      {openCreateFertilizer && <CreateFertilizerModal setOpen={setOpenCreateFertilizer} />}
-      {openCreateSeed && <CreateSeedModal setOpen={setOpenCreateSeed} />}
+      {openCreateFertilizer && <CreateFertilizerModal setOpen={setOpenCreateFertilizer} setOpenSuccess={setOpenSuccess} setMessage={setMessage} />}
+      {openCreateSeed && <CreateSeedModal setOpen={setOpenCreateSeed} setOpenSuccess={setOpenSuccess} setMessage={setMessage} />}
       <div className="border-r border-secondary w-fit h-full py-10 px-3 flex flex-col gap-8">
         <button
           type="button"

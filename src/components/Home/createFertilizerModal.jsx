@@ -5,10 +5,8 @@ import { createFertilizer } from "../../api/product";
 import { SuccessNotificationBox } from "./successNotification";
 import { fertilizerSchema } from "../../validations/fertilizerValidation";
 
-export const CreateFertilizerModal = ({ open, setOpen}) => {
+export const CreateFertilizerModal = ({ open, setOpen, setMessage, setOpenSuccess}) => {
   const [adding, setAdding] = useState(false)
-  const [message, setMessage] = useState()
-  const [openNot, setOpenNot] = useState(false)
 
   const {
     control,
@@ -27,11 +25,10 @@ export const CreateFertilizerModal = ({ open, setOpen}) => {
       if (!res.has_error) {
         setOpen(false)
         setMessage('Added succesfully')
-        setOpenNot(true)
+        setOpenSuccess(true)
       } else {
         setOpen(false)
-        setMessage(res.errors[0])
-        setShowNot(true)
+        // setMessage(res.errors[0])
       }
 
       setAdding(false);
@@ -42,7 +39,6 @@ export const CreateFertilizerModal = ({ open, setOpen}) => {
 
     return (
         <div>
-        {openNot && (<SuccessNotificationBox setShow={setOpenNot} message={message} />)}
         <div className="absolute z-40 top-0 left-0 h-screen w-screen bg-[rgba(0,0,0,.7)] flex justify-center pt-10">
           <div className="border border-[#16a34a] bg-primary rounded-lg h-fit w-1/3 p-5 relative">
             <button

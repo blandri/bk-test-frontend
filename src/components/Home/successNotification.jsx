@@ -2,7 +2,7 @@ import React from 'react';
 
 export function SuccessNotificationBox({ setShow, message }) {
   return (
-    <div className={`font-semibold absolute z-40 top-5 right-5 flex gap-4 border border-[#ef4444] bg-primary min-w-[250px] max-w-[300px] py-2 px-4 rounded-2xl`}>
+    <div className={`font-semibold absolute z-40 top-5 right-5 flex gap-4 border border-[#16a34a] bg-primary min-w-[250px] max-w-[300px] py-2 px-4 rounded-2xl`}>
       <button type="button" onClick={() => setShow(false)} className="absolute right-2 w-5 h-5 rounded-full bg-[#fecaca] grid place-items-center cursor-pointer">
         <svg
           xmlns="http://www.w3.org/2000/svg"
