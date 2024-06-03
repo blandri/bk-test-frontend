@@ -11,9 +11,10 @@ export const orderSchema = yup.object().shape({
       'len',
       'Please select a fertilizer',
       (val) => val !== 'Select',
-    ),
+    ).typeError('Please select a valid fertilizer'),
   seed: yup
     .number()
     .required('This field is required')
-    .test('len', 'Please select a seed', (val) => val !== 'Select'),
+    .test('len', 'Please select a seed', (val) => val !== 'Select')
+    .typeError('Please select a valid seed'),
 });
